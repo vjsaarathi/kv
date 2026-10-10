@@ -1,6 +1,7 @@
 package dev.kv.storage;
 
 import dev.kv.raft.LogEntry;
+import dev.kv.raft.RaftNode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
