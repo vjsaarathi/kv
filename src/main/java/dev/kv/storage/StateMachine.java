@@ -1,20 +1,25 @@
 package dev.kv.storage;
 
+import dev.kv.raft.LogEntry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * The deterministic state machine for our key-value store.
+ * The deterministic state machine driven by committed log entries.
+ *
+ * <p>Raft replicates commands, rather than map mutations. Every node applies the same committed
+ * command sequence here, so their maps converge. Callers must serialize access; {@link RaftNode}
+ * does that with its state lock.
  */
 public final class StateMachine {
   private final Map<String, String> values = new HashMap<>();
 
-  /** Applies one mutation. */
-  public void apply(String op, String key, String value) {
-    if ("PUT".equals(op)) values.put(key, value);
-    else if ("DELETE".equals(op)) values.remove(key);
-    else throw new IllegalArgumentException("unknown operation " + op);
+  /** Applies one already-committed entry exactly once. */
+  public void apply(LogEntry entry) {
+    if ("PUT".equals(entry.op())) values.put(entry.key(), entry.value());
+    else if ("DELETE".equals(entry.op())) values.remove(entry.key());
+    else throw new IllegalArgumentException("unknown operation " + entry.op());
   }
 
   /** Returns an absent optional for a key that has never been put or was deleted. */
