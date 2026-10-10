@@ -1,0 +1,62 @@
+services:
+  node1:
+    build: .
+    command:
+      - --id
+      - n1
+      - --bind
+      - 0.0.0.0:9001
+      - --peers
+      - n1=node1:9001,n2=node2:9002,n3=node3:9003
+      - --data-dir
+      - /data
+    ports:
+      - "9001:9001"
+    volumes:
+      - node1-data:/data
+    networks:
+      - raft-net
+
+  node2:
+    build: .
+    command:
+      - --id
+      - n2
+      - --bind
+      - 0.0.0.0:9002
+      - --peers
+      - n1=node1:9001,n2=node2:9002,n3=node3:9003
+      - --data-dir
+      - /data
+    ports:
+      - "9002:9002"
+    volumes:
+      - node2-data:/data
+    networks:
+      - raft-net
+
+  node3:
+    build: .
+    command:
+      - --id
+      - n3
+      - --bind
+      - 0.0.0.0:9003
+      - --peers
+      - n1=node1:9001,n2=node2:9002,n3=node3:9003
+      - --data-dir
+      - /data
+    ports:
+      - "9003:9003"
+    volumes:
+      - node3-data:/data
+    networks:
+      - raft-net
+
+volumes:
+  node1-data:
+  node2-data:
+  node3-data:
+
+networks:
+  raft-net:
